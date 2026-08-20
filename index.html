@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Generador de códigos QR 3D (3MF y STL) gratis | QRito</title>
+<meta name="description" content="Diseña tu código QR y descárgalo en PNG, SVG o en 3D listo para imprimir: 3MF a dos colores y STL. Soporte de mesa, llavero o placa. Gratis y sin registro.">
+<link rel="canonical" href="https://qrito.fun/">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#4f46e5">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Generador de códigos QR para imprimir en 3D">
+<meta property="og:description" content="Crea tu QR, personalízalo y descárgalo en 3MF a dos colores para tu impresora 3D. Soporte de mesa, llavero o placa. Gratis y sin registro.">
+<meta property="og:url" content="https://qrito.fun/">
+<meta property="og:image" content="assets/img/og-qrito.png">
+<meta property="og:locale" content="es_ES">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="styles.css?v=20260819">
+
+<!-- TODO (propietario): pega aquí el script de tu banner de consentimiento de cookies (CMP) antes de activar AdSense. -->
+
+<!-- El mapa de importación resuelve el motor 3D. NO es un script de módulo: la web sigue siendo JS clásico. -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "./lib/vendor/three/three.module.min.js",
+    "three/addons/": "./lib/vendor/three/addons/"
+  }
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "QRito — Generador de códigos QR para imprimir en 3D",
+  "url": "https://qrito.fun/",
+  "applicationCategory": "DesignApplication",
+  "operatingSystem": "Cualquier navegador moderno",
+  "description": "Generador gratuito de códigos QR personalizados con descarga en PNG, SVG y en archivo 3D (3MF a dos colores y STL) para imprimir soportes de mesa, llaveros y placas.",
+  "inLanguage": "es",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+  "featureList": [
+    "Código QR de enlace, texto o wifi",
+    "Estilos de puntos y esquinas personalizables",
+    "Logo o emoji en el centro",
+    "Descarga en PNG y SVG",
+    "Descarga en 3MF con dos colores incrustados",
+    "Descarga en STL para impresoras antiguas",
+    "Vista previa 3D interactiva"
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type":"Question","name":"¿Qué es un código QR para imprimir en 3D?","acceptedAnswer":{"@type":"Answer","text":"Es un objeto físico (un soporte, un llavero o una placa) en el que el código QR está en relieve y en un color distinto al de la base. Al tener dos colores reales, el móvil lo lee igual que si estuviera impreso en papel, pero es duradero y no se despega."}},
+    {"@type":"Question","name":"¿Por qué se descarga en 3MF y no solo en STL?","acceptedAnswer":{"@type":"Answer","text":"El formato STL solo guarda la forma, no los colores. El 3MF es el formato estándar de las impresoras 3D modernas y guarda dentro del propio archivo las dos piezas y sus colores, así que al abrirlo en tu programa (Bambu Studio, PrusaSlicer, Orca o Cura) ya aparece la base de un color y el código del otro."}},
+    {"@type":"Question","name":"¿Se puede escanear un código QR impreso en 3D?","acceptedAnswer":{"@type":"Answer","text":"Sí, siempre que haya contraste real entre la base y el código y que cada cuadradito del código mida al menos 1,5 mm. La herramienta te avisa en pantalla si el contraste es bajo o si los módulos quedan demasiado pequeños."}},
+    {"@type":"Question","name":"¿Necesito una impresora de varios colores?","acceptedAnswer":{"@type":"Answer","text":"No. El código está en relieve sobre la base, así que en una impresora de un solo color puedes hacer una pausa a la altura del relieve y cambiar la bobina. El archivo 3MF ya trae las dos piezas separadas para que el cambio sea automático si tu impresora es multicolor."}},
+    {"@type":"Question","name":"¿Cuánto tarda en imprimirse?","acceptedAnswer":{"@type":"Answer","text":"Un llavero suele tardar entre 30 y 50 minutos y gastar unos pocos gramos de filamento. Una placa o un soporte de mesa, entre 1 y 3 horas según el tamaño que elijas."}},
+    {"@type":"Question","name":"¿Mis datos o mi logo se suben a algún servidor?","acceptedAnswer":{"@type":"Answer","text":"No. Todo el proceso ocurre dentro de tu navegador: el enlace, el logo y los archivos que descargas se generan en tu propio dispositivo y no se envían a ningún sitio."}},
+    {"@type":"Question","name":"¿El código QR caduca?","acceptedAnswer":{"@type":"Answer","text":"No. Es un QR estático: el enlace va escrito dentro del propio código, no depende de ningún servicio intermedio. Funcionará mientras la dirección a la que apunta siga existiendo."}},
+    {"@type":"Question","name":"¿Puedo poner el wifi de mi local en un QR?","acceptedAnswer":{"@type":"Answer","text":"Sí. En la pestaña Wifi introduces el nombre de la red y la contraseña, y al escanear el código el móvil se conecta solo, sin teclear nada. Es lo más habitual en alojamientos turísticos y cafeterías."}}
+  ]
+}
+</script>
+</head>
+<body>
+<a class="skip-link" href="#herramienta">Ir a la herramienta</a>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a class="brand" href="/">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" focusable="false">
+        <rect x="2" y="2" width="11" height="11" rx="2.5"></rect>
+        <rect x="19" y="2" width="11" height="11" rx="2.5"></rect>
+        <rect x="2" y="19" width="11" height="11" rx="2.5"></rect>
+        <rect x="19.5" y="19.5" width="4.5" height="4.5" rx="1"></rect>
+        <rect x="25.5" y="25.5" width="4.5" height="4.5" rx="1"></rect>
+      </svg>
+      <span class="brand-name">QR<em>ito</em></span>
+    </a>
+    <nav class="site-nav" aria-label="Secciones">
+      <a href="#como-funciona">Cómo funciona</a>
+      <a href="#ideas">Ideas de uso</a>
+      <a href="#faq">Preguntas</a>
+    </nav>
+  </div>
+</header>
+
+<main id="contenido">
+
+  <section class="hero">
+    <div class="container">
+      <h1>Generador de códigos QR para imprimir en 3D</h1>
+      <p class="hero-sub">Pega tu enlace, elige el diseño y descárgalo como imagen (PNG o SVG) o como <strong>archivo 3D listo para imprimir</strong>: un <strong>.3mf con los dos colores ya dentro</strong>, para que el código tenga contraste real y se escanee de verdad. Gratis, sin registro.</p>
+
+      <div class="tool" id="herramienta">
+
+        <!-- ============ 1. CONTENIDO ============ -->
+        <section class="panel panel-contenido" aria-labelledby="t-contenido">
+          <h2 class="panel-title" id="t-contenido"><span class="step-num">1</span> ¿Qué quieres que abra el código?</h2>
+
+          <div class="seg" role="tablist" aria-label="Tipo de contenido">
+            <button type="button" class="seg-btn is-active" role="tab" aria-selected="true" data-mode="link">Enlace o texto</button>
+            <button type="button" class="seg-btn" role="tab" aria-selected="false" data-mode="wifi">Wifi</button>
+          </div>
+
+          <div class="mode-panel" data-panel="link">
+            <label class="field">
+              <span class="field-label">Enlace o texto</span>
+              <input type="text" id="in-url" value="https://qrito.fun" placeholder="https://tunegocio.com" autocomplete="off" spellcheck="false" enterkeyhint="done">
+            </label>
+            <div class="chips" aria-label="Ejemplos rápidos">
+              <button type="button" class="chip" data-fill="https://g.page/r/TU-CODIGO/review">⭐ Reseñas de Google</button>
+              <button type="button" class="chip" data-fill="https://instagram.com/tunegocio">📷 Instagram</button>
+              <button type="button" class="chip" data-fill="https://tunegocio.com/carta">🍽️ Carta o menú</button>
+              <button type="button" class="chip" data-fill="https://wa.me/34600000000">💬 WhatsApp</button>
+            </div>
+          </div>
+
+          <div class="mode-panel" data-panel="wifi" hidden>
+            <div class="grid-2">
+              <label class="field">
+                <span class="field-label">Nombre de la red (SSID)</span>
+                <input type="text" id="in-ssid" placeholder="MiCafeteria_WIFI" autocomplete="off">
+              </label>
+              <label class="field">
+                <span class="field-label">Contraseña</span>
+                <input type="text" id="in-pass" placeholder="contraseña" autocomplete="off">
+              </label>
+            </div>
+            <div class="grid-2">
+              <label class="field">
+                <span class="field-label">Seguridad</span>
+                <select id="in-sec">
+                  <option value="WPA" selected>WPA / WPA2 / WPA3</option>
+                  <option value="WEP">WEP</option>
+                  <option value="nopass">Red abierta</option>
+                </select>
+              </label>
+              <label class="check">
+                <input type="checkbox" id="in-hidden">
+                <span>Es una red oculta</span>
+              </label>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ 2. PREVISUALIZACIÓN ============ -->
+        <section class="panel panel-preview" aria-labelledby="t-preview">
+          <h2 class="panel-title" id="t-preview">Vista previa</h2>
+
+          <div class="preview-2d">
+            <div id="qr-holder" class="qr-holder" aria-label="Código QR generado" role="img"></div>
+            <noscript><p class="nojs">Esta herramienta necesita JavaScript activado para generar el código QR.</p></noscript>
+          </div>
+
+          <div class="dl-group dl-img">
+            <span class="dl-label">Imagen</span>
+            <div class="dl-row">
+              <button type="button" class="btn btn-ghost" id="dl-png">Descargar PNG</button>
+              <button type="button" class="btn btn-ghost" id="dl-svg">Descargar SVG</button>
+            </div>
+          </div>
+
+          <div class="viewer-wrap">
+            <div class="viewer-head">
+              <span class="dl-label">Objeto 3D · <span id="fmt-name">soporte de mesa</span></span>
+              <span class="viewer-hint">arrastra para girar</span>
+            </div>
+            <div id="viewer" class="viewer">
+              <div class="viewer-msg" id="viewer-msg">Preparando la vista 3D…</div>
+            </div>
+            <p class="viewer-legend">
+              <span class="swatch" id="sw-base"></span> base
+              <span class="swatch" id="sw-code"></span> código y texto
+            </p>
+          </div>
+
+          <div class="dl-group dl-main">
+            <span class="dl-label">Impresión 3D</span>
+            <button type="button" class="btn btn-primary btn-big" id="dl-3mf">
+              <span>Descargar archivo 3D (.3mf)</span>
+              <small id="dl-3mf-sub">dos colores incluidos</small>
+            </button>
+            <button type="button" class="btn btn-link" id="dl-stl">o descargar en STL (.zip) para impresoras antiguas</button>
+          </div>
+
+          <p class="privacy-badge">🔒 <strong>100 % privado.</strong> Tu enlace, tu logo y los archivos se generan dentro de tu navegador: no se suben a ningún servidor.</p>
+        </section>
+
+        <!-- ============ 3. DISEÑO ============ -->
+        <section class="panel panel-diseno" aria-labelledby="t-diseno">
+          <h2 class="panel-title" id="t-diseno"><span class="step-num">2</span> Diseño del código</h2>
+
+          <fieldset class="fs">
+            <legend class="field-label">Estilo</legend>
+            <div class="styles">
+              <label class="style-opt"><input type="radio" name="estilo" value="clasico" checked><span class="style-box"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="6" height="6"/><rect x="15" y="3" width="6" height="6"/><rect x="3" y="15" width="6" height="6"/><rect x="15" y="15" width="6" height="6"/><rect x="9" y="9" width="6" height="6"/></svg>Clásico</span></label>
+              <label class="style-opt"><input type="radio" name="estilo" value="redondeado"><span class="style-box"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="6" height="6" rx="2.2"/><rect x="15" y="3" width="6" height="6" rx="2.2"/><rect x="3" y="15" width="6" height="6" rx="2.2"/><rect x="15" y="15" width="6" height="6" rx="2.2"/><rect x="9" y="9" width="6" height="6" rx="2.2"/></svg>Redondeado</span></label>
+              <label class="style-opt"><input type="radio" name="estilo" value="puntos"><span class="style-box"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="18" r="3"/><circle cx="12" cy="12" r="3"/></svg>Puntos</span></label>
+              <label class="style-opt"><input type="radio" name="estilo" value="elegante"><span class="style-box"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6a3 3 0 0 1 3-3h3v6H3z"/><path d="M15 3h3a3 3 0 0 1 3 3v3h-6z"/><path d="M3 15h6v6H6a3 3 0 0 1-3-3z"/><path d="M15 15h6v3a3 3 0 0 1-3 3h-3z"/></svg>Elegante</span></label>
+            </div>
+          </fieldset>
+
+          <div class="grid-2">
+            <label class="field">
+              <span class="field-label">Color del código</span>
+              <span class="color-row"><input type="color" id="in-color-code" value="#1b1b22"><output id="out-color-code">#1B1B22</output></span>
+            </label>
+            <label class="field">
+              <span class="field-label">Color de la base / fondo</span>
+              <span class="color-row"><input type="color" id="in-color-base" value="#f2f1ec"><output id="out-color-base">#F2F1EC</output></span>
+            </label>
+          </div>
+          <label class="check">
+            <input type="checkbox" id="in-transparent">
+            <span>Fondo transparente en la imagen PNG y SVG</span>
+          </label>
+
+          <fieldset class="fs">
+            <legend class="field-label">En el centro (opcional)</legend>
+            <div class="emojis" id="emoji-row">
+              <button type="button" class="emoji" data-emoji="⭐">⭐</button>
+              <button type="button" class="emoji" data-emoji="🍽️">🍽️</button>
+              <button type="button" class="emoji" data-emoji="📶">📶</button>
+              <button type="button" class="emoji" data-emoji="📍">📍</button>
+              <button type="button" class="emoji" data-emoji="📷">📷</button>
+              <button type="button" class="emoji" data-emoji="💬">💬</button>
+              <button type="button" class="emoji" data-emoji="☕">☕</button>
+              <button type="button" class="emoji" data-emoji="🍕">🍕</button>
+              <button type="button" class="emoji" data-emoji="🐾">🐾</button>
+              <button type="button" class="emoji" data-emoji="🔑">🔑</button>
+              <button type="button" class="emoji" data-emoji="❤️">❤️</button>
+              <button type="button" class="emoji" data-emoji="🏠">🏠</button>
+            </div>
+            <div class="center-actions">
+              <label class="btn btn-ghost btn-sm" for="in-logo">Subir mi logo</label>
+              <input type="file" id="in-logo" accept="image/png,image/jpeg,image/webp,image/svg+xml" hidden>
+              <button type="button" class="btn btn-ghost btn-sm" id="btn-clear-center" hidden>Quitar</button>
+              <span class="center-state" id="center-state"></span>
+            </div>
+          </fieldset>
+        </section>
+
+        <!-- ============ 4. OBJETO 3D ============ -->
+        <section class="panel panel-3d" aria-labelledby="t-3d">
+          <h2 class="panel-title" id="t-3d"><span class="step-num">3</span> Objeto para imprimir</h2>
+
+          <fieldset class="fs">
+            <legend class="field-label">Formato</legend>
+            <div class="formats">
+              <label class="fmt-opt"><input type="radio" name="formato" value="soporte" checked><span class="fmt-box">
+                <svg viewBox="0 0 40 32" aria-hidden="true"><path d="M4 27h32v3H4z"/><path d="M11 27 24 6l4 2.6L16.5 27z"/><rect x="18" y="10" width="7" height="7" rx="1.2" transform="rotate(-31 21.5 13.5)"/></svg>
+                <b>Soporte de mesa</b><small>cartas, reseñas, mostrador</small></span></label>
+              <label class="fmt-opt"><input type="radio" name="formato" value="llavero"><span class="fmt-box">
+                <svg viewBox="0 0 40 32" aria-hidden="true"><rect x="9" y="4" width="22" height="24" rx="4"/><circle cx="20" cy="9" r="2.4" fill="#fff"/><rect x="14" y="14" width="12" height="10" rx="1.5" fill="#fff"/></svg>
+                <b>Llavero</b><small>con agujero para la anilla</small></span></label>
+              <label class="fmt-opt"><input type="radio" name="formato" value="placa"><span class="fmt-box">
+                <svg viewBox="0 0 40 32" aria-hidden="true"><rect x="6" y="4" width="28" height="24" rx="3"/><circle cx="11" cy="9" r="1.8" fill="#fff"/><circle cx="29" cy="9" r="1.8" fill="#fff"/><rect x="13" y="13" width="14" height="11" rx="1.5" fill="#fff"/></svg>
+                <b>Placa de pared</b><small>dos agujeros para colgar</small></span></label>
+            </div>
+          </fieldset>
+
+          <label class="field">
+            <span class="field-label">Tamaño <output id="out-size">70 mm</output></span>
+            <input type="range" id="in-size" min="35" max="150" step="1" value="70">
+          </label>
+
+          <label class="field">
+            <span class="field-label">Texto en relieve (opcional)</span>
+            <input type="text" id="in-text" maxlength="22" placeholder="Nombre de tu negocio" autocomplete="off">
+            <span class="hint">Puedes incluir un emoji: por ejemplo <em>⭐ Déjanos tu reseña</em></span>
+          </label>
+
+          <dl class="specs">
+            <div><dt>Módulos del código</dt><dd id="sp-modules">—</dd></div>
+            <div><dt>Tamaño de cada módulo</dt><dd id="sp-mm">—</dd></div>
+            <div><dt>Medidas de la pieza</dt><dd id="sp-dims">—</dd></div>
+            <div><dt>Altura del relieve</dt><dd>1,2 mm</dd></div>
+          </dl>
+
+          <div class="warnings" id="warnings" role="status" aria-live="polite"></div>
+        </section>
+
+      </div><!-- /.tool -->
+
+      <p class="limits">Funciona con enlaces de hasta ~300 caracteres. Cuanto más largo sea el enlace, más pequeños serán los cuadraditos del código: si te avisamos de que quedan por debajo de 1,5&nbsp;mm, agranda la pieza o acorta el enlace.</p>
+    </div>
+  </section>
+
+  <!-- ANUNCIO: banner horizontal bajo la herramienta -->
+  <div class="container">
+    <div class="ad-slot ad-house ad-leaderboard" data-house-slot="wide" role="complementary" aria-label="Espacio publicitario">
+      <span class="ad-tag">Publicidad</span>
+      <!-- Publicidad propia mientras no hay AdSense activo. Para volver a un
+           hueco vacío de terceros, borra data-house-slot y este enlace. -->
+      <a class="ad-house-link" href="https://www.pickevent.site" target="_blank" rel="noopener sponsored">
+        <img class="ad-house-img" src="assets/img/ads/pickevent-wide.webp" alt="PickEvent — la memoria viva compartida: escanea el QR del evento y tus fotos aparecen al instante en la pantalla" loading="lazy" width="1000" height="279">
+      </a>
+    </div>
+  </div>
+
+  <section class="section" id="como-funciona">
+    <div class="container">
+      <h2>Cómo funciona, en 3 pasos</h2>
+      <ol class="steps">
+        <li>
+          <span class="step-badge">1</span>
+          <h3>Pega tu enlace</h3>
+          <p>La carta del restaurante, tu página de reseñas de Google, tu Instagram, tu web… o los datos del wifi del local para que los clientes se conecten sin teclear nada.</p>
+        </li>
+        <li>
+          <span class="step-badge">2</span>
+          <h3>Personaliza el diseño</h3>
+          <p>Elige el estilo de los puntos, los dos colores y, si quieres, pon tu logo o un emoji en el centro. Todo se actualiza al instante en la vista previa.</p>
+        </li>
+        <li>
+          <span class="step-badge">3</span>
+          <h3>Descárgalo e imprímelo</h3>
+          <p>Como imagen en PNG o SVG, o como archivo 3D en <strong>3MF con los dos colores dentro</strong>. Lo abres en el programa de tu impresora y a imprimir.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="section section-alt" id="ideas">
+    <div class="container">
+      <h2>Ideas de uso</h2>
+      <p class="section-sub">Un código QR impreso en 3D no se despega, no se moja y se ve profesional encima del mostrador.</p>
+      <div class="ideas">
+        <article class="idea"><span class="idea-ico">🍽️</span><h3>Carta de restaurante</h3><p>Un soporte de mesa en cada mesa con el enlace a la carta digital. Se limpia con un trapo y aguanta el trajín del servicio.</p></article>
+        <article class="idea"><span class="idea-ico">⭐</span><h3>«Déjanos una reseña»</h3><p>El clásico cartelito de reseñas de Google, pero en relieve y con tu nombre. Colócalo junto a la caja al cobrar.</p></article>
+        <article class="idea"><span class="idea-ico">📶</span><h3>Wifi para alojamientos</h3><p>Apartamentos turísticos, hoteles y cafeterías: el huésped escanea y el móvil se conecta solo, sin contraseñas escritas en un papel.</p></article>
+        <article class="idea"><span class="idea-ico">🎟️</span><h3>Llaveros para eventos</h3><p>Bodas, ferias, congresos: un llavero con el QR del programa, del álbum de fotos compartido o de tu tarjeta de contacto.</p></article>
+        <article class="idea"><span class="idea-ico">📷</span><h3>Redes sociales del negocio</h3><p>Una placa en la pared con el QR de tu Instagram o TikTok para que te sigan mientras esperan.</p></article>
+        <article class="idea"><span class="idea-ico">🏠</span><h3>Placas de casa y taller</h3><p>Instrucciones de la lavadora del apartamento, manual de una máquina, ficha de una planta, contacto de emergencia en la puerta del garaje.</p></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ANUNCIO: bloque intercalado en el contenido -->
+  <div class="container">
+    <div class="ad-slot ad-house ad-incontent" data-house-slot="square" role="complementary" aria-label="Espacio publicitario">
+      <span class="ad-tag">Publicidad</span>
+      <a class="ad-house-link" href="https://www.planningmanager.app" target="_blank" rel="noopener sponsored">
+        <img class="ad-house-img" src="assets/img/ads/planning-square.webp" alt="PlanningManager — check-in con QR, gestión de invitados y mesas para tus eventos" loading="lazy" width="700" height="710">
+      </a>
+    </div>
+  </div>
+
+  <section class="section" id="guia">
+    <div class="container prose">
+      <h2>Cómo imprimir un código QR en 3D que se escanee de verdad</h2>
+      <p>Imprimir un código QR en tres dimensiones no es lo mismo que imprimirlo en papel. El lector del móvil no ve relieve: ve <strong>contraste</strong>. Por eso, si sacas la pieza entera en un solo color, la cámara no distingue los cuadraditos oscuros de los claros y el código sencillamente no funciona, por muy bien impreso que esté. La solución es hacer la pieza en dos colores: una base clara y el código en relieve en un color oscuro (o al revés, aunque el orden clásico se lee mejor).</p>
+      <p>Ahí es donde entra el formato <strong>3MF</strong>. El archivo STL de toda la vida guarda solo la forma: un montón de triángulos y nada más. El 3MF, en cambio, es el formato estándar de las impresoras 3D modernas y guarda dentro del propio archivo las piezas por separado <em>y</em> el color de cada una. Cuando abres el .3mf que descargas aquí en Bambu Studio, PrusaSlicer, Orca Slicer o Cura, aparecen ya dos piezas encajadas: la base con tu color de fondo y el código con tu color de código. Si tu impresora es multicolor, asigna cada una a un filamento automáticamente; si es de un solo color, basta con programar una pausa a la altura del relieve y cambiar la bobina.</p>
+      <h3>El tamaño de los módulos manda</h3>
+      <p>Cada cuadradito del código se llama <em>módulo</em>. En una impresora FDM corriente, con una boquilla de 0,4&nbsp;mm, un módulo por debajo de <strong>1,5&nbsp;mm</strong> sale con las esquinas redondeadas y los bordes emborronados, y el lector empieza a fallar. Como el número de módulos depende de cuánta información metas, un enlace largo obliga a una pieza más grande. Dos trucos que funcionan siempre: usa la dirección más corta posible (por ejemplo el enlace corto de reseñas de Google en lugar de la URL larga del perfil) y, si aun así queda apretado, sube el tamaño de la pieza con el deslizador. La herramienta te enseña en todo momento cuántos módulos tiene tu código y cuánto mide cada uno.</p>
+      <h3>Altura del relieve y acabado</h3>
+      <p>Con <strong>1,2&nbsp;mm</strong> de relieve vas sobrado: suficiente para que el cambio de color quede limpio y para que se note al tacto, sin disparar el tiempo de impresión. Imprime la pieza con la cara del código hacia arriba y con relleno bajo (un 10–15&nbsp;% sobra), y no hace falta soporte en ninguno de los tres formatos: el soporte de mesa está diseñado como una cuña con la cara inclinada hacia arriba, precisamente para eso. Un acabado mate ayuda: el filamento brillante refleja la luz del flash y puede molestar al escanear.</p>
+      <h3>Logo, emoji y texto</h3>
+      <p>Puedes poner tu logo o un emoji en el centro del código y un texto corto en relieve debajo (el nombre del negocio, «Escanea la carta», «⭐ Déjanos tu reseña»). Cuando hay algo en el centro, el generador sube automáticamente el nivel de corrección de errores del código a «alto», que es lo que permite que siga leyéndose aunque una parte quede tapada. Aun así, la recomendación de siempre: antes de imprimir veinte unidades, imprime una y escanéala con dos o tres móviles distintos.</p>
+      <h3>¿Y si mi impresora es antigua?</h3>
+      <p>También te damos la descarga en <strong>STL</strong>, dentro de un .zip con las dos piezas por separado y un archivo de instrucciones. Las importas las dos, las colocas en la misma posición (0,0) y asignas un material a cada una. Es más artesanal, pero el resultado es idéntico.</p>
+    </div>
+  </section>
+
+  <section class="section section-alt" id="faq">
+    <div class="container">
+      <h2>Preguntas frecuentes</h2>
+      <div class="faq">
+        <details><summary>¿Qué es un código QR para imprimir en 3D?</summary><p>Es un objeto físico (un soporte, un llavero o una placa) en el que el código QR está en relieve y en un color distinto al de la base. Al tener dos colores reales, el móvil lo lee igual que si estuviera impreso en papel, pero es duradero y no se despega.</p></details>
+        <details><summary>¿Por qué se descarga en 3MF y no solo en STL?</summary><p>El formato STL solo guarda la forma, no los colores. El 3MF es el formato estándar de las impresoras 3D modernas y guarda dentro del propio archivo las dos piezas y sus colores, así que al abrirlo en tu programa (Bambu Studio, PrusaSlicer, Orca o Cura) ya aparece la base de un color y el código del otro.</p></details>
+        <details><summary>¿Se puede escanear un código QR impreso en 3D?</summary><p>Sí, siempre que haya contraste real entre la base y el código y que cada cuadradito del código mida al menos 1,5&nbsp;mm. La herramienta te avisa en pantalla si el contraste es bajo o si los módulos quedan demasiado pequeños.</p></details>
+        <details><summary>¿Necesito una impresora de varios colores?</summary><p>No. El código está en relieve sobre la base, así que en una impresora de un solo color puedes programar una pausa a la altura del relieve y cambiar la bobina. El archivo 3MF ya trae las dos piezas separadas para que el cambio sea automático si tu impresora es multicolor.</p></details>
+        <details><summary>¿Cuánto tarda en imprimirse y cuánto material gasta?</summary><p>Un llavero suele tardar entre 30 y 50 minutos y gastar unos pocos gramos de filamento. Una placa o un soporte de mesa, entre 1 y 3 horas según el tamaño que elijas.</p></details>
+        <details><summary>¿Mis datos o mi logo se suben a algún servidor?</summary><p>No. Todo el proceso ocurre dentro de tu navegador: el enlace, el logo y los archivos que descargas se generan en tu propio dispositivo y no se envían a ningún sitio.</p></details>
+        <details><summary>¿El código QR caduca?</summary><p>No. Es un QR estático: el enlace va escrito dentro del propio código, no depende de ningún servicio intermedio. Funcionará mientras la dirección a la que apunta siga existiendo.</p></details>
+        <details><summary>¿Puedo poner el wifi de mi local en un QR?</summary><p>Sí. En la pestaña <em>Wifi</em> introduces el nombre de la red y la contraseña, y al escanear el código el móvil se conecta solo, sin teclear nada. Es lo más habitual en alojamientos turísticos y cafeterías.</p></details>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <p class="footer-brand"><strong>QRito</strong> · Generador de códigos QR para imprimir en 3D</p>
+    <nav class="footer-nav" aria-label="Legal">
+      <a href="privacidad.html">Privacidad</a>
+      <a href="aviso-legal.html">Aviso legal</a>
+    </nav>
+    <p class="footer-note">Herramienta gratuita. Todo se procesa en tu navegador; no guardamos tus enlaces ni tus archivos.</p>
+  </div>
+</footer>
+
+<!-- ANUNCIO: aviso pequeño en una esquina -->
+<aside class="ad-corner ad-house" id="ad-corner" data-house-slot="tall" hidden aria-label="Espacio publicitario">
+  <button type="button" class="ad-corner-close" id="ad-corner-close" aria-label="Cerrar">×</button>
+  <span class="ad-tag">Publicidad</span>
+  <a class="ad-house-link" id="ad-corner-link" href="https://www.pickevent.site" target="_blank" rel="noopener sponsored">
+    <img class="ad-house-img" id="ad-corner-img" src="assets/img/ads/pickevent-tall.webp" alt="PickEvent — la memoria viva compartida" loading="lazy" width="480" height="860">
+  </a>
+</aside>
+
+<!-- ANUNCIO: ventana emergente tras la descarga -->
+<dialog class="ad-modal" id="ad-modal" aria-labelledby="ad-modal-title">
+  <div class="ad-modal-head">
+    <p id="ad-modal-title">✅ Descarga iniciada</p>
+    <button type="button" class="ad-modal-x" id="ad-modal-x" aria-label="Cerrar">×</button>
+  </div>
+  <div class="ad-slot ad-house ad-modal-slot" data-house-slot="square">
+    <span class="ad-tag">Publicidad</span>
+    <a class="ad-house-link" id="ad-modal-link" href="https://www.planningmanager.app" target="_blank" rel="noopener sponsored">
+      <img class="ad-house-img" id="ad-modal-img" src="assets/img/ads/planning-square.webp" alt="PlanningManager — check-in con QR, gestión de invitados y mesas para tus eventos" loading="lazy" width="700" height="710">
+    </a>
+  </div>
+  <button type="button" class="btn btn-ghost" id="ad-modal-close">Cerrar y seguir</button>
+</dialog>
+
+<!-- motores locales (nada se carga desde fuera) -->
+<script defer src="lib/vendor/qr-code-styling.js?v=20260819"></script>
+<script defer src="lib/vendor/jszip.min.js?v=20260819"></script>
+<script defer src="lib/manifest.js?v=20260819"></script>
+<script defer src="qr3d.js?v=20260819"></script>
+<script defer src="main.js?v=20260819"></script>
+</body>
+</html>
