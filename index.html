@@ -21,7 +21,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="styles.css?v=20260819b">
+<link rel="stylesheet" href="styles.css?v=20260820">
 
 <!-- TODO (propietario): pega aquí el script de tu banner de consentimiento de cookies (CMP) antes de activar AdSense. -->
 
@@ -299,15 +299,17 @@
     </div>
   </section>
 
-  <!-- ANUNCIO: banner horizontal bajo la herramienta -->
+  <!-- ANUNCIO: banner horizontal bajo la herramienta (solo creatividades anchas) -->
   <div class="container">
-    <div class="ad-slot ad-house ad-leaderboard" data-house-slot="wide" role="complementary" aria-label="Espacio publicitario">
-      <span class="ad-tag">Publicidad</span>
+    <div class="ad-block" role="complementary" aria-label="Espacio publicitario">
+      <span class="ad-block-tag">Publicidad</span>
       <!-- Publicidad propia mientras no hay AdSense activo. Para volver a un
-           hueco vacío de terceros, borra data-house-slot y este enlace. -->
-      <a class="ad-house-link" href="https://www.pickevent.site" target="_blank" rel="noopener sponsored">
-        <img class="ad-house-img" src="assets/img/ads/pickevent-wide.webp" alt="PickEvent — la memoria viva compartida: escanea el QR del evento y tus fotos aparecen al instante en la pantalla" loading="lazy" width="1000" height="279">
-      </a>
+           hueco vacío de terceros, borra el enlace de dentro. -->
+      <div class="ad-slot ad-house ad-leaderboard">
+        <a class="ad-house-link" href="https://www.pickevent.site" target="_blank" rel="noopener sponsored">
+          <img class="ad-house-img" src="assets/img/ads/pickevent-wide.webp" alt="PickEvent — la memoria viva compartida: escanea el QR del evento y tus fotos aparecen al instante en la pantalla" loading="lazy" width="1000" height="279">
+        </a>
+      </div>
     </div>
   </div>
 
@@ -349,13 +351,22 @@
     </div>
   </section>
 
-  <!-- ANUNCIO: bloque intercalado en el contenido -->
+  <!-- ANUNCIO: bloque de cuadrados intercalado en el contenido (las dos apps a la vez, en grande) -->
   <div class="container">
-    <div class="ad-slot ad-house ad-incontent" data-house-slot="square" role="complementary" aria-label="Espacio publicitario">
-      <span class="ad-tag">Publicidad</span>
-      <a class="ad-house-link" href="https://www.planningmanager.app" target="_blank" rel="noopener sponsored">
-        <img class="ad-house-img" src="assets/img/ads/planning-square.webp" alt="PlanningManager — check-in con QR, gestión de invitados y mesas para tus eventos" loading="lazy" width="700" height="710">
-      </a>
+    <div class="ad-block" role="complementary" aria-label="Espacio publicitario">
+      <span class="ad-block-tag">Publicidad</span>
+      <div class="ad-squares-grid">
+        <div class="ad-house ad-square-card">
+          <a class="ad-house-link" href="https://www.pickevent.site" target="_blank" rel="noopener sponsored">
+            <img class="ad-house-img" src="assets/img/ads/pickevent-square.webp" alt="PickEvent — la memoria viva compartida: escanea el QR del evento y tus fotos aparecen al instante en la pantalla" loading="lazy" width="700" height="700">
+          </a>
+        </div>
+        <div class="ad-house ad-square-card">
+          <a class="ad-house-link" href="https://www.planningmanager.app" target="_blank" rel="noopener sponsored">
+            <img class="ad-house-img" src="assets/img/ads/planning-square.webp" alt="PlanningManager — check-in con QR, gestión de invitados y mesas para tus eventos" loading="lazy" width="700" height="710">
+          </a>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -429,10 +440,10 @@
 </dialog>
 
 <!-- motores locales (nada se carga desde fuera) -->
-<script defer src="lib/vendor/qr-code-styling.js?v=20260819b"></script>
-<script defer src="lib/vendor/jszip.min.js?v=20260819b"></script>
-<script defer src="lib/manifest.js?v=20260819b"></script>
-<script defer src="qr3d.js?v=20260819b"></script>
-<script defer src="main.js?v=20260819b"></script>
+<script defer src="lib/vendor/qr-code-styling.js?v=20260820"></script>
+<script defer src="lib/vendor/jszip.min.js?v=20260820"></script>
+<script defer src="lib/manifest.js?v=20260820"></script>
+<script defer src="qr3d.js?v=20260820"></script>
+<script defer src="main.js?v=20260820"></script>
 </body>
 </html>

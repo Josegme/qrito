@@ -9,34 +9,37 @@
   var data = (window.__BRAND__ || {});
   var cfg = data.ads || {};
   var $ = function (s) { return document.querySelector(s); };
+  var $$ = function (s) { return Array.prototype.slice.call(document.querySelectorAll(s)); };
   function safe(fn, name) { try { fn(); } catch (e) { console.warn("[" + name + "]", e); } }
 
   /* ---------- Publicidad propia (PickEvent / PlanningManager) ----------
-     Las 3 imágenes de cada campaña (wide/square/tall) van todas al mismo
-     saco: cada hueco (banner, bloque, esquina, pop-up) tiene su PROPIO
-     contador independiente guardado en sessionStorage, con un punto de
-     partida distinto para que no coincidan, y cada vez que le toca pintar
-     avanza su contador en +1 y toma la siguiente imagen del saco — así se
-     ve cualquiera de las 6 en cualquier hueco, sin que dos avances se
-     cancelen entre sí (el fallo de antes: un contador COMPARTIDO consumido
-     de 2 en 2 con solo 2 campañas volvía siempre al mismo sitio). */
+     Cada hueco usa SOLO la forma de imagen que le encaja: el banner
+     horizontal alterna las dos creatividades anchas, el bloque de
+     contenido enseña los dos cuadrados a la vez (intercambiando lado) y
+     la esquina alterna las verticales. Cada hueco lleva su propio
+     contador en sessionStorage y avanza de UNO en uno: con 2 campañas
+     eso garantiza que alterne de verdad en cada ciclo. */
   var houseAds = data.houseAds || [];
-  var adPool = [];
-  houseAds.forEach(function (ad) {
-    ["wide", "square", "tall"].forEach(function (shape) {
-      if (ad[shape]) adPool.push({ url: ad.url, alt: ad.alt, src: ad[shape] });
-    });
-  });
 
-  function makeAdCounter(key, startAt) {
+  function readCount(key, startAt) {
     var n;
     try { n = parseInt(sessionStorage.getItem(key), 10); } catch (e) { n = NaN; }
-    if (isNaN(n)) n = startAt;
-    return function next() {
-      if (!adPool.length) return null;
-      var item = adPool[((n % adPool.length) + adPool.length) % adPool.length];
+    return isNaN(n) ? (startAt || 0) : n;
+  }
+  function saveCount(key, n) { try { sessionStorage.setItem(key, String(n)); } catch (e) {} }
+
+  function adAt(i, shape) {
+    if (!houseAds.length) return null;
+    var ad = houseAds[((i % houseAds.length) + houseAds.length) % houseAds.length];
+    return { url: ad.url, alt: ad.alt, src: ad[shape] || ad.square };
+  }
+
+  function makeRotator(key, shape, startAt) {
+    var n = readCount(key, startAt);
+    return function () {
+      var item = adAt(n, shape);
       n += 1;
-      try { sessionStorage.setItem(key, String(n)); } catch (e) {}
+      saveCount(key, n);
       return item;
     };
   }
@@ -58,46 +61,71 @@
     }
   }
 
-  /* Banner bajo la herramienta + bloque de contenido: rotan solas con el tiempo,
-     máximo cada `rotateMs` (10 s por defecto), y nunca muestran a la vez la
-     misma imagen gracias a arrancar en puntos distintos del mismo saco. */
-  function initHouseAdsRotate() {
-    if (adPool.length < 2) return;
-    var slots = [
-      { link: $(".ad-leaderboard .ad-house-link"), img: $(".ad-leaderboard .ad-house-img"), next: makeAdCounter("qr3d.ad.leaderboard", 0) },
-      { link: $(".ad-incontent .ad-house-link"), img: $(".ad-incontent .ad-house-img"), next: makeAdCounter("qr3d.ad.incontent", Math.ceil(adPool.length / 2)) }
-    ].filter(function (s) { return s.link && s.img; });
-    if (!slots.length) return;
-
-    var tick = function (crossfade) {
-      slots.forEach(function (s) { paintHouseAd(s.link, s.img, s.next(), crossfade); });
-    };
+  /* Pequeño motor de rotación: arranca, pausa si la pestaña se oculta y
+     reanuda al volver. Lo usan el banner/cuadrados y también la esquina. */
+  function runRotation(tick) {
     tick(false);                                       // primera pintura, sin difuminado
-
     var timer = null;
     var start = function () {
       if (timer || document.hidden) return;
-      timer = setInterval(function () { tick(true); }, cfg.rotateMs || 10000);
+      timer = setInterval(function () { tick(true); }, cfg.rotateMs || 9500);
     };
     var stop = function () { clearInterval(timer); timer = null; };
     start();
     document.addEventListener("visibilitychange", function () {
       if (document.hidden) stop(); else start();
     });
+    return { stop: stop };
   }
 
-  /* Aviso pequeño en la esquina: aparece pasado un rato y se recuerda cerrado. */
+  function initHouseAdsRotate() {
+    if (houseAds.length < 2) return;
+    var jobs = [];
+
+    // Banner horizontal: solo las creatividades anchas, alternando.
+    var bLink = $(".ad-leaderboard .ad-house-link"), bImg = $(".ad-leaderboard .ad-house-img");
+    if (bLink && bImg) {
+      var nextBanner = makeRotator("qr3d.ad.banner", "wide", 0);
+      jobs.push(function (fade) { paintHouseAd(bLink, bImg, nextBanner(), fade); });
+    }
+
+    // Bloque de cuadrados: las dos campañas visibles a la vez, cambiando de lado.
+    var cards = $$(".ad-square-card");
+    if (cards.length) {
+      var sqKey = "qr3d.ad.squares";
+      var sqN = readCount(sqKey, 0);
+      jobs.push(function (fade) {
+        cards.forEach(function (card, i) {
+          paintHouseAd(card.querySelector(".ad-house-link"), card.querySelector(".ad-house-img"), adAt(sqN + i, "square"), fade);
+        });
+        sqN += 1;
+        saveCount(sqKey, sqN);
+      });
+    }
+
+    if (!jobs.length) return;
+    runRotation(function (fade) { jobs.forEach(function (j) { j(fade); }); });
+  }
+
+  /* Aviso pequeño en la esquina: aparece pasado un rato, va rotando mientras
+     está visible y se recuerda cerrado durante toda la sesión. */
   function initCornerAd() {
     var box = $("#ad-corner"), btn = $("#ad-corner-close");
     if (!box || !btn) return;
     if (sessionStorage.getItem("qr3d.corner") === "off") return;
-    var next = makeAdCounter("qr3d.ad.corner", 1);
+    var next = makeRotator("qr3d.ad.corner", "tall", 1);
+    var link = $("#ad-corner-link"), img = $("#ad-corner-img");
+    var rotation = null;
+
     setTimeout(function () {
-      paintHouseAd($("#ad-corner-link"), $("#ad-corner-img"), next(), false);
+      if (sessionStorage.getItem("qr3d.corner") === "off") return;
       box.hidden = false;
+      rotation = runRotation(function (fade) { paintHouseAd(link, img, next(), fade); });
     }, cfg.cornerDelayMs || 14000);
+
     btn.addEventListener("click", function () {
       box.hidden = true;
+      if (rotation) rotation.stop();
       try { sessionStorage.setItem("qr3d.corner", "off"); } catch (e) {}
     });
   }
@@ -107,7 +135,7 @@
     var dlg = $("#ad-modal");
     if (!dlg || typeof dlg.showModal !== "function") return;
     var last = 0;
-    var nextModalAd = makeAdCounter("qr3d.ad.modal", 4);
+    var nextModalAd = makeRotator("qr3d.ad.modal", "square", 1);
     var close = function () { if (dlg.open) dlg.close(); };
 
     document.addEventListener("qr3d:descargado", function () {

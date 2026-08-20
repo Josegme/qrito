@@ -338,11 +338,13 @@ fieldset.fs legend { padding: 0; }
 }
 .ad-corner[hidden] { display: none; }
 .ad-corner-close {
-  position: absolute; top: -.55rem; right: -.55rem; width: 1.6rem; height: 1.6rem;
+  position: absolute; top: -.6rem; right: -.6rem; width: 1.9rem; height: 1.9rem;
   display: grid; place-items: center; border-radius: 999px;
-  background: var(--ink); color: var(--bg); font-size: 1rem; line-height: 1;
-  z-index: 2;
+  background: var(--ink); color: var(--bg); font-size: 1.15rem; line-height: 1;
+  border: 2px solid var(--panel); box-shadow: 0 2px 8px rgba(0,0,0,.35);
+  z-index: 3;
 }
+.ad-corner-close:hover { background: var(--accent); color: #fff; }
 
 .ad-modal {
   border: 0; border-radius: var(--radius); padding: 1.25rem;
@@ -357,38 +359,75 @@ fieldset.fs legend { padding: 0; }
 .ad-modal-slot { min-height: 250px; margin: 0 0 .9rem; }
 .ad-modal .btn { width: 100%; }
 
-/* --- Publicidad propia (house ads): PickEvent / PlanningManager, rotan ---
-   El enlace se ancla absoluto al hueco (evita los líos de altura en % que
-   arrastran grid+bloque+imagen) para que la imagen SIEMPRE quede contenida
-   en el tamaño del hueco, nunca deformada ni desbordada. */
-.ad-house { border-style: solid; overflow: hidden; padding: 0; }
+/* --- Publicidad propia (house ads): PickEvent / PlanningManager ---
+   Regla de oro: cada hueco usa SOLO la forma de imagen que le encaja
+   (el banner horizontal nunca muestra un cuadrado) y el marco se ajusta
+   a la imagen, en vez de dejarla flotando dentro de una caja enorme. */
+.ad-block { margin: clamp(1.5rem, 4vw, 2.5rem) 0; }
+.ad-block-tag {
+  display: block; text-align: center; margin-bottom: .55rem;
+  font-size: .68rem; font-weight: 700; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--muted); opacity: .7;
+}
+.ad-house {
+  position: relative; display: block; padding: 0; overflow: hidden;
+  border: 1.5px solid var(--line-2); border-radius: var(--radius);
+  background: var(--panel-2);
+}
 .ad-house .ad-tag {
-  position: absolute; top: .55rem; left: .55rem; z-index: 2;
-  padding: .2rem .5rem; border-radius: 999px;
-  background: color-mix(in srgb, var(--ink) 68%, transparent); color: #fff;
-  opacity: 1; letter-spacing: .1em; font-size: .62rem;
+  position: absolute; top: .5rem; left: .5rem; z-index: 2;
+  padding: .18rem .5rem; border-radius: 999px;
+  background: color-mix(in srgb, var(--ink) 70%, transparent); color: #fff;
+  opacity: 1; letter-spacing: .1em; font-size: .6rem;
 }
-.ad-house-link {
-  position: absolute; inset: 0;
-  transition: opacity .18s var(--ease-out);
-}
-.ad-house-link:hover, .ad-house-link:focus-visible { opacity: .92; }
+.ad-house-link { display: block; transition: opacity .18s var(--ease-out); }
+.ad-house-link:hover, .ad-house-link:focus-visible { opacity: .93; }
 .ad-house-img {
-  width: 100%; height: 100%; object-fit: contain; background: var(--panel-2);
+  display: block; margin-inline: auto;
   opacity: 1; transition: opacity .35s var(--ease-out);
 }
 .ad-house-img.is-swapping { opacity: 0; }
-.ad-leaderboard.ad-house { height: clamp(92px, 13vw, 150px); }
-.ad-incontent.ad-house .ad-house-img { padding: .6rem; }
-.ad-modal-slot.ad-house { aspect-ratio: 1 / 1; min-height: unset; }
 
-.ad-corner.ad-house {
-  /* proporción intermedia: por aquí pueden pasar las 3 formas de imagen
-     (ancha, cuadrada, vertical) sin que ninguna quede recortada */
-  width: 150px; aspect-ratio: 3 / 4; min-height: unset;
-  display: block; padding: 0;
+/* Banner: el marco se encoge hasta la imagen, así se ve grande y sin hueco muerto. */
+.ad-leaderboard.ad-house {
+  /* sin marco: la creatividad se muestra sola y centrada, a su tamaño
+     natural, para que no queden bandas muertas a los lados */
+  border: 0; background: none; overflow: visible;
+  width: 100%; margin-inline: auto; min-height: 0; height: auto;
+  display: flex; justify-content: center;
 }
-.ad-corner.ad-house .ad-house-img { border-radius: 13px; }
+.ad-leaderboard.ad-house .ad-house-img {
+  width: auto; height: auto;
+  max-width: 100%; max-height: clamp(120px, 18vw, 235px);
+  border-radius: var(--radius);
+}
+
+/* Bloque de cuadrados: las dos apps a la vez y en grande. */
+.ad-squares-grid {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(.7rem, 2vw, 1.15rem);
+  max-width: 860px; margin-inline: auto;
+}
+.ad-square-card .ad-house-img { width: 100%; height: auto; }
+
+.ad-modal-slot.ad-house { min-height: 0; margin: 0 0 .9rem; }
+.ad-modal-slot.ad-house .ad-house-img { width: 100%; height: auto; }
+
+/* Esquina: solo creatividades verticales, a su proporción exacta.
+   OJO: `position: fixed` debe repetirse aquí — `.ad-house` declara
+   `position: relative` más abajo en la hoja y, a igualdad de
+   especificidad, ganaría y tiraría el aviso al final de la página. */
+.ad-corner.ad-house {
+  position: fixed; right: 1rem; bottom: 1rem; z-index: 60;
+  width: clamp(140px, 14vw, 200px); aspect-ratio: 480 / 860;
+  min-height: 0; box-shadow: var(--shadow-lg);
+}
+.ad-corner.ad-house .ad-house-img { width: 100%; height: 100%; object-fit: cover; }
+
+/* Los cuadrados, uno debajo de otro en pantallas estrechas. */
+@media (max-width: 639px) {
+  .ad-squares-grid { grid-template-columns: 1fr; max-width: 340px; }
+}
 
 /* ============ 9. Responsive ============ */
 @media (max-width: 539px) {
@@ -404,7 +443,7 @@ fieldset.fs legend { padding: 0; }
   .fmt-box svg { flex: none; }
   .site-nav { display: none; }
   .ad-corner { width: 132px; min-height: 104px; right: .6rem; bottom: .6rem; }
-  .ad-corner.ad-house { width: 108px; min-height: unset; }
+  .ad-corner.ad-house { width: 124px; min-height: 0; }
 }
 @media (min-width: 720px) {
   .footer-inner { grid-template-columns: 1fr auto; align-items: center; }
