@@ -383,10 +383,12 @@ fieldset.fs legend { padding: 0; }
 .ad-modal-slot.ad-house { aspect-ratio: 1 / 1; min-height: unset; }
 
 .ad-corner.ad-house {
-  width: 136px; aspect-ratio: 480 / 860; min-height: unset;
+  /* proporción intermedia: por aquí pueden pasar las 3 formas de imagen
+     (ancha, cuadrada, vertical) sin que ninguna quede recortada */
+  width: 150px; aspect-ratio: 3 / 4; min-height: unset;
   display: block; padding: 0;
 }
-.ad-corner.ad-house .ad-house-img { object-fit: cover; border-radius: 13px; }
+.ad-corner.ad-house .ad-house-img { border-radius: 13px; }
 
 /* ============ 9. Responsive ============ */
 @media (max-width: 539px) {

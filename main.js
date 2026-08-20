@@ -12,30 +12,42 @@
   function safe(fn, name) { try { fn(); } catch (e) { console.warn("[" + name + "]", e); } }
 
   /* ---------- Publicidad propia (PickEvent / PlanningManager) ----------
-     Reparto en turnos: cada vez que un hueco necesita una campaña, avanza
-     un contador compartido (guardado en sessionStorage) y toma la siguiente
-     de la lista. Con 2 campañas, dos huecos consecutivos SIEMPRE muestran
-     una distinta cada uno; y a lo largo de la sesión los huecos van
-     alternando cuál les toca — así se intercalan en sitio y en tiempo. */
+     Las 3 imágenes de cada campaña (wide/square/tall) van todas al mismo
+     saco: cada hueco (banner, bloque, esquina, pop-up) tiene su PROPIO
+     contador independiente guardado en sessionStorage, con un punto de
+     partida distinto para que no coincidan, y cada vez que le toca pintar
+     avanza su contador en +1 y toma la siguiente imagen del saco — así se
+     ve cualquiera de las 6 en cualquier hueco, sin que dos avances se
+     cancelen entre sí (el fallo de antes: un contador COMPARTIDO consumido
+     de 2 en 2 con solo 2 campañas volvía siempre al mismo sitio). */
   var houseAds = data.houseAds || [];
+  var adPool = [];
+  houseAds.forEach(function (ad) {
+    ["wide", "square", "tall"].forEach(function (shape) {
+      if (ad[shape]) adPool.push({ url: ad.url, alt: ad.alt, src: ad[shape] });
+    });
+  });
 
-  function nextHouseAd() {
-    if (!houseAds.length) return null;
-    var n = 0;
-    try { n = parseInt(sessionStorage.getItem("qr3d.adSeq") || "0", 10) || 0; } catch (e) {}
-    var ad = houseAds[n % houseAds.length];
-    try { sessionStorage.setItem("qr3d.adSeq", String(n + 1)); } catch (e) {}
-    return ad;
+  function makeAdCounter(key, startAt) {
+    var n;
+    try { n = parseInt(sessionStorage.getItem(key), 10); } catch (e) { n = NaN; }
+    if (isNaN(n)) n = startAt;
+    return function next() {
+      if (!adPool.length) return null;
+      var item = adPool[((n % adPool.length) + adPool.length) % adPool.length];
+      n += 1;
+      try { sessionStorage.setItem(key, String(n)); } catch (e) {}
+      return item;
+    };
   }
 
-  function paintHouseAd(link, img, ad, shape, crossfade) {
-    if (!link || !img || !ad) return;
-    var src = ad[shape] || ad.square;
-    if (img.getAttribute("src") === src) return;      // nada que cambiar
-    link.href = ad.url;
+  function paintHouseAd(link, img, item, crossfade) {
+    if (!link || !img || !item) return;
+    link.href = item.url;
+    if (img.getAttribute("src") === item.src) return;   // ya está esa imagen puesta
     var apply = function () {
-      img.src = src;
-      img.alt = ad.alt;
+      img.src = item.src;
+      img.alt = item.alt;
       img.classList.remove("is-swapping");
     };
     if (crossfade) {
@@ -46,25 +58,26 @@
     }
   }
 
-  /* Banner bajo la herramienta + bloque de contenido: rotan solas con el tiempo. */
+  /* Banner bajo la herramienta + bloque de contenido: rotan solas con el tiempo,
+     máximo cada `rotateMs` (10 s por defecto), y nunca muestran a la vez la
+     misma imagen gracias a arrancar en puntos distintos del mismo saco. */
   function initHouseAdsRotate() {
-    if (!houseAds.length) return;
+    if (adPool.length < 2) return;
     var slots = [
-      { link: $(".ad-leaderboard .ad-house-link"), img: $(".ad-leaderboard .ad-house-img"), shape: "wide" },
-      { link: $(".ad-incontent .ad-house-link"), img: $(".ad-incontent .ad-house-img"), shape: "square" }
+      { link: $(".ad-leaderboard .ad-house-link"), img: $(".ad-leaderboard .ad-house-img"), next: makeAdCounter("qr3d.ad.leaderboard", 0) },
+      { link: $(".ad-incontent .ad-house-link"), img: $(".ad-incontent .ad-house-img"), next: makeAdCounter("qr3d.ad.incontent", Math.ceil(adPool.length / 2)) }
     ].filter(function (s) { return s.link && s.img; });
     if (!slots.length) return;
 
     var tick = function (crossfade) {
-      slots.forEach(function (s) { paintHouseAd(s.link, s.img, nextHouseAd(), s.shape, crossfade); });
+      slots.forEach(function (s) { paintHouseAd(s.link, s.img, s.next(), crossfade); });
     };
     tick(false);                                       // primera pintura, sin difuminado
-    if (slots.length < 2 && houseAds.length < 2) return; // nada que rotar con una sola campaña
 
     var timer = null;
     var start = function () {
       if (timer || document.hidden) return;
-      timer = setInterval(function () { tick(true); }, cfg.rotateMs || 9000);
+      timer = setInterval(function () { tick(true); }, cfg.rotateMs || 10000);
     };
     var stop = function () { clearInterval(timer); timer = null; };
     start();
@@ -78,8 +91,9 @@
     var box = $("#ad-corner"), btn = $("#ad-corner-close");
     if (!box || !btn) return;
     if (sessionStorage.getItem("qr3d.corner") === "off") return;
+    var next = makeAdCounter("qr3d.ad.corner", 1);
     setTimeout(function () {
-      paintHouseAd($("#ad-corner-link"), $("#ad-corner-img"), nextHouseAd(), "tall", false);
+      paintHouseAd($("#ad-corner-link"), $("#ad-corner-img"), next(), false);
       box.hidden = false;
     }, cfg.cornerDelayMs || 14000);
     btn.addEventListener("click", function () {
@@ -93,13 +107,14 @@
     var dlg = $("#ad-modal");
     if (!dlg || typeof dlg.showModal !== "function") return;
     var last = 0;
+    var nextModalAd = makeAdCounter("qr3d.ad.modal", 4);
     var close = function () { if (dlg.open) dlg.close(); };
 
     document.addEventListener("qr3d:descargado", function () {
       var now = Date.now();
       if (now - last < (cfg.modalCooldownMs || 45000)) return;
       last = now;
-      paintHouseAd($("#ad-modal-link"), $("#ad-modal-img"), nextHouseAd(), "square", false);
+      paintHouseAd($("#ad-modal-link"), $("#ad-modal-img"), nextModalAd(), false);
       setTimeout(function () {
         if (!dlg.open) { try { dlg.showModal(); } catch (e) {} }
       }, cfg.modalDelayMs || 350);
